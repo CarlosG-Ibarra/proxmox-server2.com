@@ -10,9 +10,9 @@ if(empty($usuario) || empty($email) || empty($password)) {
 }
 
 // 3. Auth0 Configuration
-$auth0_domain = 'dev-disjapan7@fs6chap.us.auth0.com';
-$client_id = 'vcvcX9qopsdnFTYJ4e1bVNnDkTZQaR0a';
-$client_secret = 'V1jgWNU1Vx2gX-PKSUI1A8u19df3ejNeUd0cjjMF8fNFdhQQxd9r';
+$auth0_domain = 'dev-4bipmsm70fe6chqp.us.auth0.com';
+$client_id = 'VcVcX9Oqps4nFTYJ4el8vRmDKR7QaRO0';
+$client_secret = 'V1jgXAUiVSz9gX-PkSUIlASu19df3ejNeUdoCjjNP8fWFdM0Qxq9mqqoSofqF13L';
 $connection = 'Username-Password-Authentication';
 
 // 4. Get Auth0 Management API Token
