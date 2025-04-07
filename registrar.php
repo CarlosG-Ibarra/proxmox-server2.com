@@ -1,4 +1,10 @@
 <?php
+
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // 1. Get form data
 $usuario = $_POST['username'] ?? '';
 $email = $_POST['email'] ?? '';
@@ -85,27 +91,92 @@ if ($httpcode !== 201) {
         ($data['message'] ?? 'Unknown error'));
 }
 
-// 7. Store in MariaDB with password hashing
-$conexion = new mysqli('localhost', "webapp_user", "A1123456789", "secureapp");
+// 7. Store in MariaDB with transaction handling
+$dbSuccess = false;
+$conexion = null;
+$stmt = null;
 
-if($conexion->connect_error) {
-    die("Conexión Fallida: " . $conexion->connect_error);
+try {
+    // Connect to MariaDB
+    $conexion = new mysqli('localhost', "webapp_user", "A1123456789", "secureapp");
+    
+    if($conexion->connect_error) {
+        throw new Exception("Conexión Fallida: " . $conexion->connect_error);
+    }
+    
+    // Start transaction
+    $conexion->autocommit(false);
+    
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    if ($hashedPassword === false) {
+        throw new Exception("Error al hashear la contraseña");
+    }
+    
+    // Prepare statement
+    $stmt = $conexion->prepare('INSERT INTO users (username, email, password) VALUES (?,?,?)');
+    if (!$stmt) {
+        throw new Exception("Error al preparar la consulta: " . $conexion->error);
+    }
+    
+    // Bind parameters
+    if (!$stmt->bind_param("sss", $usuario, $email, $hashedPassword)) {
+        throw new Exception("Error al vincular parámetros: " . $stmt->error);
+    }
+    
+    // Execute
+    if (!$stmt->execute()) {
+        throw new Exception("Error al ejecutar la consulta: " . $stmt->error);
+    }
+    
+    // Commit transaction
+    $conexion->commit();
+    $dbSuccess = true;
+    
+} catch (Exception $e) {
+    // Rollback on error
+    if ($conexion) {
+        $conexion->rollback();
+    }
+    error_log("Database Error: " . $e->getMessage());
+    $dbSuccess = false;
+} finally {
+    // Clean up resources
+    if ($stmt) $stmt->close();
+    if ($conexion) $conexion->close();
 }
 
-// Hash password before storing
-$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-$stmt = $conexion->prepare('INSERT INTO users (username, email, password) VALUES (?,?,?)');
-$stmt->bind_param("sss", $usuario, $email, $hashedPassword);
-
-if($stmt->execute()) {
-    echo "Usuario registrado exitosamente en Auth0 y la base de datos<br>";
+// Output results
+if ($dbSuccess) {
+    echo "<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Registro Completo</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            .success { color: #4CAF50; font-size: 24px; margin-bottom: 20px; }
+            .error { color: #f44336; }
+            .btn {
+                display: inline-block;
+                padding: 10px 20px;
+                background: #4CAF50;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='success'>✓ Registro exitoso</div>
+        <p>Usuario creado en Auth0 y en la base de datos local.</p>
+        <a href='index.html' class='btn'>Volver al inicio</a>
+    </body>
+    </html>";
 } else {
-    echo "Error: ". $stmt->error;
+    echo "<div class='error'>Error: Usuario creado en Auth0 pero no en la base de datos local.</div>";
+    error_log("Partial success: User created in Auth0 but not in MariaDB");
 }
 
-$stmt->close();
-$conexion->close();
-
-echo "<br><a href='index.html'>Volver</a>";
+exit();
 ?>
