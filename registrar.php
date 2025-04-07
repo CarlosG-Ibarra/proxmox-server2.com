@@ -98,7 +98,7 @@ $stmt = null;
 
 try {
     // Connect to MariaDB
-    $conexion = new mysqli('localhost', "webapp_user", "A1123456789", "secureapp");
+    $conexion = new mysqli('localhost', "webapp_user", "A!123456789", "secureapp");
     
     if($conexion->connect_error) {
         throw new Exception("Conexión Fallida: " . $conexion->connect_error);

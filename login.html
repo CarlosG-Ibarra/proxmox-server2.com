@@ -2,54 +2,131 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureApp - Login</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input[type="text"], input[type="password"], input[type="submit"] { 
-            width: 100%; padding: 8px; box-sizing: border-box; 
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 400px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], 
+        input[type="password"] { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
         .action-button { 
-            padding: 10px 15px; margin-right: 10px; 
-            background-color: #2196F3; color: white; 
-            border: none; border-radius: 4px; cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
+            padding: 12px 20px; 
+            background-color: #2196F3; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover { 
+            background-color: #0b7dda; 
+        }
+        .error-message {
+            color: #f44336;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            display: none;
+        }
+        .section { 
+            margin-top: 30px; 
+            border-top: 1px solid #eee; 
+            padding-top: 20px; 
+        }
+        .footer-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .footer-links a {
+            flex: 1;
             text-align: center;
         }
-        .action-button:hover { background-color: #0b7dda; }
-        .section { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Iniciar Sesión</h1>
-    
-    <form method="post" action="login.php">
-        <div class="form-group">
-            <label for="username">Usuario:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+    <div class="login-container">
+        <h1 style="text-align: center; margin-bottom: 25px;">Iniciar Sesión</h1>
         
-        <div class="form-group">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <!-- Error message placeholder -->
+        <div class="error-message" id="errorMessage"></div>
         
-        <input type="submit" class="action-button" value="Ingresar">
-        <a href="index.html" class="action-button">Volver</a>
-    </form>
-    
-    <div class="section">
-        <h2>Registros en la base de datos</h2>
-        <form method="GET" action="mostrar.php">
-            <input type="submit" class="action-button" value="Ver usuarios registrados">
+        <form method="post" action="login.php" id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required 
+                       autocomplete="username" placeholder="Ingrese su usuario">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required
+                       autocomplete="current-password" placeholder="Ingrese su contraseña">
+            </div>
+            
+            <input type="submit" class="action-button" value="Ingresar">
         </form>
         
-        <h2>Registros en la base de datos a través de blockchain</h2>
-        <form method="GET" action="blockchain0.php">
-            <input type="submit" class="action-button" value="Ver usuarios registrados vía blockchain">
-        </form>
+        <div class="section">
+            <div class="footer-links">
+                <form method="GET" action="mostrar.php" style="flex: 1;">
+                    <input type="submit" class="action-button" value="Ver usuarios" 
+                           style="background-color: #4CAF50;">
+                </form>
+                <a href="index.html" class="action-button" 
+                   style="background-color: #607d8b; text-decoration: none; display: block;">Volver</a>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // Display any error messages from URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            
+            if (error) {
+                const errorElement = document.getElementById('errorMessage');
+                errorElement.textContent = decodeURIComponent(error);
+                errorElement.style.display = 'block';
+            }
+            
+            // Form submission handling
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                // You could add client-side validation here
+                // e.preventDefault(); // Uncomment if doing AJAX submission
+            });
+        });
+    </script>
 </body>
 </html>
