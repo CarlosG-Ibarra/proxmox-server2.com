@@ -21,9 +21,9 @@ if (empty($email) || empty($password)) {
 $auth0_domain = 'dev-4bipmsm70fe6chqp.us.auth0.com';
 $client_id = 'VcVcX9Oqps4nFTYJ4el8vRmDKR7QaRO0';
 $client_secret = 'V1jgXAUiVSz9gX-PkSUIlASu19df3ejNeUdoCjjNP8fWFdM0Qxq9mqqoSofqF13L';
-$realm = 'Username-Password-Authentication'; // Your Auth0 connection name
+$realm = 'Username-Password-Authentication';
 
-// 4. Authenticate with Auth0 using Password Realm grant
+// 4. Authenticate with Auth0
 $ch = curl_init();
 curl_setopt_array($ch, [
     CURLOPT_URL => "https://$auth0_domain/oauth/token",
@@ -31,7 +31,7 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => http_build_query([
         'grant_type' => 'http://auth0.com/oauth/grant-type/password-realm',
-        'username' => $email, // Using email as username
+        'username' => $email,
         'password' => $password,
         'client_id' => $client_id,
         'client_secret' => $client_secret,
@@ -58,31 +58,62 @@ if ($httpCode !== 200) {
 
 $authData = json_decode($response, true);
 
-// 6. Create user session with Auth0 data
+// 6. Store session data
 $_SESSION['user_email'] = $email;
 $_SESSION['auth0_token'] = $authData['access_token'];
 $_SESSION['id_token'] = $authData['id_token'];
 
-// Get user profile from ID token
-$tokenParts = explode('.', $authData['id_token']);
-$tokenPayload = base64_decode($tokenParts[1]);
-$userData = json_decode($tokenPayload, true);
+// 7. Show success message
+echo '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de sesión exitoso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f5f5f5;
+        }
+        .success-container {
+            background: white;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success-icon {
+            color: #4CAF50;
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1>¡Inicio de sesión exitoso!</h1>
+        <p>Has iniciado sesión correctamente como '.htmlspecialchars($email).'</p>
+        <a href="login.html" class="btn">Regresar</a>
+    </div>
+</body>
+</html>';
 
-// Store relevant user data in session
-$_SESSION['user_name'] = $userData['name'] ?? '';
-$_SESSION['user_picture'] = $userData['picture'] ?? '';
-
-// 7. Set secure cookie
-setcookie('auth_token', $authData['access_token'], [
-    'expires' => time() + 3600,
-    'path' => '/',
-    'domain' => $_SERVER['HTTP_HOST'],
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-
-// 8. Successful login redirect
-header("Location: dashboard.php");
 exit();
 ?>
