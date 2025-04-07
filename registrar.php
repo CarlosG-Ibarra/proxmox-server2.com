@@ -22,7 +22,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'client_id' => $client_id,
     'client_secret' => $client_secret,
-    'audience' => "https://$auth0_domain/api/v2/",
+    'audience' => "https://dev-4bipmsm70fe6chqp.us.auth0.com/api/v2/",
     'grant_type' => 'client_credentials'
 ]));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
