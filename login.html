@@ -27,7 +27,7 @@
             font-weight: bold;
             color: #333;
         }
-        input[type="text"], 
+        input[type="email"], 
         input[type="password"] { 
             width: 100%; 
             padding: 12px; 
@@ -58,34 +58,19 @@
             border-radius: 4px;
             display: none;
         }
-        .section { 
-            margin-top: 30px; 
-            border-top: 1px solid #eee; 
-            padding-top: 20px; 
-        }
-        .footer-links {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .footer-links a {
-            flex: 1;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h1 style="text-align: center; margin-bottom: 25px;">Iniciar Sesión</h1>
         
-        <!-- Error message placeholder -->
         <div class="error-message" id="errorMessage"></div>
         
         <form method="post" action="login.php" id="loginForm">
             <div class="form-group">
-                <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" required 
-                       autocomplete="username" placeholder="Ingrese su usuario">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required 
+                       autocomplete="email" placeholder="Ingrese su email">
             </div>
             
             <div class="form-group">
@@ -96,21 +81,9 @@
             
             <input type="submit" class="action-button" value="Ingresar">
         </form>
-        
-        <div class="section">
-            <div class="footer-links">
-                <form method="GET" action="mostrar.php" style="flex: 1;">
-                    <input type="submit" class="action-button" value="Ver usuarios" 
-                           style="background-color: #4CAF50;">
-                </form>
-                <a href="index.html" class="action-button" 
-                   style="background-color: #607d8b; text-decoration: none; display: block;">Volver</a>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Display any error messages from URL parameters
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const error = urlParams.get('error');
@@ -120,12 +93,6 @@
                 errorElement.textContent = decodeURIComponent(error);
                 errorElement.style.display = 'block';
             }
-            
-            // Form submission handling
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                // You could add client-side validation here
-                // e.preventDefault(); // Uncomment if doing AJAX submission
-            });
         });
     </script>
 </body>
